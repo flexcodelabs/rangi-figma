@@ -1,0 +1,149 @@
+<h1>generate hues, shades, and/or shadows</h1>
+
+<form id="pluginForm">
+  <fieldset>
+    <legend>Starting color</legend>
+    <div>
+      <label for="colorCode">Color</label>
+      <input type="color" name="colorCode" id="colorCode" value="#206CF2" />
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Generate</legend>
+    <div>
+      <div id="hueGroup">
+        <input type="checkbox" name="hue" id="hue" checked />
+        <label for="hue">Hue</label>
+      </div>
+      <div id="tintGroup">
+        <input type="checkbox" name="tint" id="tint" />
+        <label for="tint">Tint</label>
+      </div>
+      <div id="shadeGroup">
+        <input type="checkbox" name="shade" id="shade" />
+        <label for="shade">Shade</label>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Generated frames configs</legend>
+    <p>Choose how the generated circles with your colors will be</p>
+
+    <div>
+      <label for="circleSize">Circle Size</label>
+      <input
+        type="number"
+        name="circleSize"
+        id="circleSize"
+        value="120"
+        min="48"
+      />
+    </div>
+
+    <div>
+      <label for="circleSpace">Circle Spacing</label>
+      <input
+        type="number"
+        name="circleSpace"
+        id="circleSpace"
+        value="30"
+        min="0"
+      />
+    </div>
+
+    <div>
+      <label>Choose frame orientation</label>
+      <input type="radio" name="direction" id="frameH" checked />
+      <label for="frameH">Horizontal</label>
+      <input type="radio" name="direction" id="frameV" />
+      <label for="frameV">Vertical</label>
+    </div>
+  </fieldset>
+
+  <input type="hidden" name="frameDirection" value="horizontal" />
+
+  <button id="generate">Generate</button>
+  <button id="cancel">Cancel</button>
+</form>
+
+<script>
+  let hueOption = document.getElementById('hue')
+  let tintOption = document.getElementById('tint')
+  let shadeOption = document.getElementById('shade')
+  let hueGroup = document.getElementById('hueGroup')
+  let tintGroup = document.getElementById('tintGroup')
+  let shadeGroup = document.getElementById('shadeGroup')
+
+  class NumberContainer {
+    constructor(name, min, max, value) {
+      ;(this.name = name),
+        (this.min = min),
+        (this.max = max),
+        (this.value = value)
+    }
+
+    createElement() {
+      let container = document.createElement('div')
+      container.setAttribute('id', `${this.name}NumberContainer`)
+
+      let label = document.createElement('label')
+      label.setAttribute('for', `${this.name}Number`)
+      label.textContent = `How many ${this.name}s`
+
+      let input = document.createElement('input')
+      input.setAttribute('type', 'number')
+      input.setAttribute('name', `${this.name}Number`)
+      input.setAttribute('id', `${this.name}Number`)
+      input.setAttribute('min', `${this.min}`)
+      input.setAttribute('max', `${this.max}`)
+      input.setAttribute('value', `${this.value}`)
+
+      container.appendChild(label)
+      container.appendChild(input)
+
+      return container
+    }
+  }
+
+  const options = [
+    {
+      name: 'hue',
+      option: hueOption,
+      group: hueGroup,
+      container: 'hueNumberContainer',
+    },
+    {
+      name: 'tint',
+      option: tintOption,
+      group: tintGroup,
+      container: 'tintNumberContainer',
+    },
+    {
+      name: 'shade',
+      option: shadeOption,
+      group: shadeGroup,
+      container: 'shadeNumberContainer',
+    },
+  ]
+
+  options.forEach((option) => {
+    if (option.option.checked) {
+      let newContainer = new NumberContainer(`${option.name}`, 2, 360, 10)
+      let optionContainer = newContainer.createElement()
+      option.group.appendChild(optionContainer)
+    }
+
+    option.option.addEventListener('change', () => {
+      if (option.option.checked) {
+        let newContainer = new NumberContainer(`${option.name}`, 2, 360, 10)
+        let optionContainer = newContainer.createElement()
+        option.group.appendChild(optionContainer)
+      } else {
+        let optionContainer = document.getElementById(`${option.container}`)
+        option.group.removeChild(optionContainer)
+      }
+    })
+  })
+</script>

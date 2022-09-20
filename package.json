@@ -1,0 +1,16 @@
+{
+  "name": "rangi",
+  "version": "1.0.0",
+  "description": "A Figma plugin to help generate hues, tinds, and/or shades",
+  "main": "code.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "watch": "npm run build -- --watch"
+  },
+  "author": "Flexcode Labs",
+  "license": "",
+  "devDependencies": {
+    "@figma/plugin-typings": "*",
+    "typescript": "*"
+  }
+}
