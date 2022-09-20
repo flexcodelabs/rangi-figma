@@ -146,4 +146,28 @@
       }
     })
   })
+
+  document.getElementById('generate').onclick = (e) => {
+    let pluginForm = document.getElementById('pluginForm')
+    let pluginFormData = new FormData(pluginForm)
+    let pluginInputs = {}
+
+    if (document.getElementById('frameH').checked) {
+      pluginFormData.set('frameDirection', 'horizontal')
+    } else if (document.getElementById('frameV').checked) {
+      pluginFormData.set('frameDirection', 'vertical')
+    }
+
+    for (let [key, value] of pluginFormData) {
+      pluginInputs[key] = value
+    }
+    parent.postMessage(
+      { pluginMessage: { type: 'actionGenerate', pluginInputs } },
+      '*'
+    )
+  }
+
+  document.getElementById('cancel').onclick = (e) => {
+    parent.postMessage({ pluginMessage: { type: 'actionExit' } }, '*')
+  }
 </script>

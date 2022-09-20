@@ -1,6 +1,6 @@
 # rangi
 
-A Figma plugin to help generate hues, tinds, and/or shades
+A Figma plugin to help generate hues, tints, and/or shades
 
 ## Features
 

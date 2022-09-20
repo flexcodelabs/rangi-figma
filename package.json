@@ -8,7 +8,7 @@
     "watch": "npm run build -- --watch"
   },
   "author": "Flexcode Labs",
-  "license": "",
+  "license": "Figma Community Resource License",
   "devDependencies": {
     "@figma/plugin-typings": "*",
     "typescript": "*"
