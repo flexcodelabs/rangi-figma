@@ -108,16 +108,16 @@
 
         options.forEach((option) => {
           let optionContainer = document.createElement('div')
-          optionContainer.setAttribute('id', `${option}forHuesGroup`)
+          optionContainer.setAttribute('id', `${option}ForHuesGroup`)
 
           let label = document.createElement('label')
-          label.setAttribute('for', `${option}forHues`)
+          label.setAttribute('for', `${option}ForHues`)
           label.textContent = `Generate ${option} for each hue`
 
           let input = document.createElement('input')
           input.setAttribute('type', 'checkbox')
-          input.setAttribute('name', `${option}forHues`)
-          input.setAttribute('id', `${option}forHues`)
+          input.setAttribute('name', `${option}ForHues`)
+          input.setAttribute('id', `${option}ForHues`)
 
           optionContainer.appendChild(input)
           optionContainer.appendChild(label)

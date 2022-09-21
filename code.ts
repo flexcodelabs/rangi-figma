@@ -91,16 +91,43 @@ figma.showUI(__html__, { width: 400, height: 600, title: 'rangi' })
 
 figma.ui.onmessage = (msg) => {
   if (msg.type === 'actionGenerate') {
-    const inputs = msg.pluginInputs
+    const {
+      circleSize,
+      circleSpace,
+      colorCode,
+      direction,
+      frameDirection,
+      hue,
+      hueNumber,
+      shade,
+      shadeNumber,
+      shadeForHues,
+      tint,
+      tintNumber,
+      tintForHues,
+    } = msg.pluginInputs
 
     console.log(
-      inputs,
-      generateHues(
-        hexToHSL(inputs.colorCode).h,
-        hexToHSL(inputs.colorCode).s,
-        hexToHSL(inputs.colorCode).l,
-        parseInt(inputs.hueNumber)
-      )
+      circleSize,
+      circleSpace,
+      colorCode,
+      direction,
+      frameDirection,
+      hue,
+      hueNumber,
+      shade,
+      shadeNumber,
+      shadeForHues,
+      tint,
+      tintNumber,
+      tintForHues,
+      msg.pluginInputs
+      // generateHues(
+      //   hexToHSL(inputs.colorCode).h,
+      //   hexToHSL(inputs.colorCode).s,
+      //   hexToHSL(inputs.colorCode).l,
+      //   parseInt(inputs.hueNumber)
+      // )
     )
 
     figma.closePlugin('Hues generated')
