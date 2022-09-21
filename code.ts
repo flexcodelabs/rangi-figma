@@ -54,20 +54,70 @@ const hexToHSL = (hex: string) => {
   return { h, s, l }
 }
 
+const hslToRGB = (h: number, s: number, l: number) => {
+  // Must be fractions of 1
+  s /= 100
+  l /= 100
+
+  let c = (1 - Math.abs(2 * l - 1)) * s,
+    x = c * (1 - Math.abs(((h / 60) % 2) - 1)),
+    m = l - c / 2,
+    r = 0,
+    g = 0,
+    b = 0
+
+  if (0 <= h && h < 60) {
+    r = c
+    g = x
+    b = 0
+  } else if (60 <= h && h < 120) {
+    r = x
+    g = c
+    b = 0
+  } else if (120 <= h && h < 180) {
+    r = 0
+    g = c
+    b = x
+  } else if (180 <= h && h < 240) {
+    r = 0
+    g = x
+    b = c
+  } else if (240 <= h && h < 300) {
+    r = x
+    g = 0
+    b = c
+  } else if (300 <= h && h < 360) {
+    r = c
+    g = 0
+    b = x
+  }
+  r = Math.round((r + m) * 255)
+  g = Math.round((g + m) * 255)
+  b = Math.round((b + m) * 255)
+
+  return { r, g, b }
+}
+
 const generateHues = (h: number, s: number, l: number, step: number) => {
   let positiveSum = h
   let negativeSum = h
   let hs: number[] = []
 
-  for (let i = h; negativeSum >= 0; i--) {
-    hs.push(negativeSum)
+  while (negativeSum >= 0) {
     negativeSum -= step
+    if (negativeSum >= 0) {
+      hs.push(negativeSum)
+    }
   }
 
-  for (let i = h; positiveSum <= 360; i++) {
-    hs.push(positiveSum)
+  while (positiveSum <= 359) {
     positiveSum += step
+    if (positiveSum <= 359) {
+      hs.push(positiveSum)
+    }
   }
+
+  hs = hs.sort((a, b) => a - b)
 
   let uniqhs = hs.filter((h, index) => {
     return hs.indexOf(h) === index
@@ -107,28 +157,52 @@ figma.ui.onmessage = (msg) => {
       tintForHues,
     } = msg.pluginInputs
 
-    console.log(
-      circleSize,
-      circleSpace,
-      colorCode,
-      direction,
-      frameDirection,
-      hue,
-      hueNumber,
-      shade,
-      shadeNumber,
-      shadeForHues,
-      tint,
-      tintNumber,
-      tintForHues,
-      msg.pluginInputs
-      // generateHues(
-      //   hexToHSL(inputs.colorCode).h,
-      //   hexToHSL(inputs.colorCode).s,
-      //   hexToHSL(inputs.colorCode).l,
-      //   parseInt(inputs.hueNumber)
-      // )
+    const parentFrame = figma.createFrame()
+    parentFrame.name = `Hues for ${colorCode}`
+    parentFrame.layoutMode = frameDirection.toUpperCase()
+
+    parentFrame.paddingTop = 50
+    parentFrame.paddingRight = 50
+    parentFrame.paddingBottom = 50
+    parentFrame.paddingLeft = 50
+
+    parentFrame.itemSpacing = parseInt(circleSpace)
+    parentFrame.primaryAxisSizingMode = 'AUTO'
+    parentFrame.counterAxisSizingMode = 'AUTO'
+
+    const generatedHues = generateHues(
+      hexToHSL(colorCode).h,
+      hexToHSL(colorCode).s,
+      hexToHSL(colorCode).l,
+      parseInt(hueNumber)
     )
+
+    generatedHues.forEach((generatedHue) => {
+      const hueNode = figma.createEllipse()
+      hueNode.resize(parseInt(circleSize), parseInt(circleSize))
+
+      const { r, g, b } = hslToRGB(
+        generatedHue.h,
+        generatedHue.s,
+        generatedHue.l
+      )
+
+      const figmaR = r / 255
+      const figmaG = g / 255
+      const figmaB = b / 255
+
+      hueNode.fills = [
+        { type: 'SOLID', color: { r: figmaR, g: figmaG, b: figmaB } },
+      ]
+
+      parentFrame.appendChild(hueNode)
+
+      const selectFrame: FrameNode[] = []
+      selectFrame.push(parentFrame)
+
+      figma.currentPage.selection = selectFrame
+      figma.viewport.scrollAndZoomIntoView(selectFrame)
+    })
 
     figma.closePlugin('Hues generated')
   } else if (msg.type === 'actionExit') {
