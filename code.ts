@@ -94,6 +94,7 @@ figma.ui.onmessage = (msg) => {
     const inputs = msg.pluginInputs
 
     console.log(
+      inputs,
       generateHues(
         hexToHSL(inputs.colorCode).h,
         hexToHSL(inputs.colorCode).s,

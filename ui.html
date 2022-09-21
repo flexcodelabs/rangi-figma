@@ -10,7 +10,7 @@
   </fieldset>
 
   <fieldset>
-    <legend>Generate</legend>
+    <legend>Generate from the Starting color</legend>
     <div>
       <div id="hueGroup">
         <input type="checkbox" name="hue" id="hue" checked />
@@ -90,7 +90,7 @@
 
       let label = document.createElement('label')
       label.setAttribute('for', `${this.name}Number`)
-      label.textContent = `How many ${this.name}s`
+      label.textContent = `Space between ${this.name}s`
 
       let input = document.createElement('input')
       input.setAttribute('type', 'number')
@@ -100,8 +100,37 @@
       input.setAttribute('max', `${this.max}`)
       input.setAttribute('value', `${this.value}`)
 
-      container.appendChild(label)
-      container.appendChild(input)
+      if (this.name === 'hue') {
+        let tintHueGroup = document.createElement('div')
+        tintHueGroup.setAttribute('id', 'tintHueGroup')
+
+        let options = ['tint', 'shade']
+
+        options.forEach((option) => {
+          let optionContainer = document.createElement('div')
+          optionContainer.setAttribute('id', `${option}forHuesGroup`)
+
+          let label = document.createElement('label')
+          label.setAttribute('for', `${option}forHues`)
+          label.textContent = `Generate ${option} for each hue`
+
+          let input = document.createElement('input')
+          input.setAttribute('type', 'checkbox')
+          input.setAttribute('name', `${option}forHues`)
+          input.setAttribute('id', `${option}forHues`)
+
+          optionContainer.appendChild(input)
+          optionContainer.appendChild(label)
+          tintHueGroup.appendChild(optionContainer)
+        })
+
+        container.appendChild(label)
+        container.appendChild(input)
+        container.appendChild(tintHueGroup)
+      } else {
+        container.appendChild(label)
+        container.appendChild(input)
+      }
 
       return container
     }
