@@ -1,23 +1,4 @@
-const hexToHSL = (hex: string) => {
-  const hexValue = hex.replace('#', '')
-
-  let rgbFromHex = hexValue.match(/.{1,2}/g)
-  let rgb: any = []
-  if (rgbFromHex) {
-    rgb = [
-      parseInt(rgbFromHex[0], 16),
-      parseInt(rgbFromHex[1], 16),
-      parseInt(rgbFromHex[2], 16),
-    ]
-  }
-
-  let r: number, g: number, b: number
-
-  // Make r, g, and b fractions of 1
-  r = rgb[0] / 255
-  g = rgb[1] / 255
-  b = rgb[2] / 255
-
+const rgbToHSL = (r: number, g: number, b: number) => {
   // Find greatest and smallest channel values
   let cmin = Math.min(r, g, b),
     cmax = Math.max(r, g, b),
@@ -52,6 +33,29 @@ const hexToHSL = (hex: string) => {
   l = +(l * 100).toFixed(1)
 
   return { h, s, l }
+}
+
+const hexToHSL = (hex: string) => {
+  const hexValue = hex.replace('#', '')
+
+  let rgbFromHex = hexValue.match(/.{1,2}/g)
+  let rgb: any = []
+  if (rgbFromHex) {
+    rgb = [
+      parseInt(rgbFromHex[0], 16),
+      parseInt(rgbFromHex[1], 16),
+      parseInt(rgbFromHex[2], 16),
+    ]
+  }
+
+  let r: number, g: number, b: number
+
+  // Make r, g, and b fractions of 1
+  r = rgb[0] / 255
+  g = rgb[1] / 255
+  b = rgb[2] / 255
+
+  return rgbToHSL(r, g, b)
 }
 
 const hslToRGB = (h: number, s: number, l: number) => {
@@ -137,6 +141,37 @@ const generateHues = (h: number, s: number, l: number, step: number) => {
   return hsls
 }
 
+const generateTints = (r: number, g: number, b: number, step: number) => {
+  let { h, s, l } = rgbToHSL(r, g, b)
+
+  const plusFactor = l / step
+  const tints = []
+
+  while (l <= 100) {
+    const tint = hslToRGB(h, s, l)
+    tints.push(tint)
+    l = l + plusFactor
+  }
+
+  return tints
+}
+
+const generateShades = (r: number, g: number, b: number, step: number) => {
+  let { h, s, l } = rgbToHSL(r, g, b)
+
+  const minusFactor = l / step
+  const shades = []
+
+  while (l >= 0) {
+
+    const shade = hslToRGB(h, s, l)
+    shades.push(shade)
+    l = l - minusFactor
+  }
+
+  return shades
+}
+
 interface Padding {
   top: number
   right: number
@@ -212,6 +247,7 @@ figma.ui.onmessage = (msg) => {
       bottom: 50,
       left: 50,
     }
+
     const parentFrame = new ContainingFrame(
       `Hues for ${colorCode}`,
       frameDirection.toUpperCase(),
@@ -229,9 +265,6 @@ figma.ui.onmessage = (msg) => {
     )
 
     generatedHues.forEach((generatedHue) => {
-      const hueNode = figma.createEllipse()
-      hueNode.resize(parseInt(circleSize), parseInt(circleSize))
-
       const { r, g, b } = hslToRGB(
         generatedHue.h,
         generatedHue.s,
@@ -242,17 +275,112 @@ figma.ui.onmessage = (msg) => {
       const figmaG = g / 255
       const figmaB = b / 255
 
-      hueNode.fills = [
-        { type: 'SOLID', color: { r: figmaR, g: figmaG, b: figmaB } },
-      ]
+      if (tintsForHues === 'on') {
+        const tints = generateTints(figmaR, figmaG, figmaB, tintsForHuesAmount)
+        const layoutMode =
+          frameDirection === 'horizontal' ? 'VERTICAL' : 'HORIZONTAL'
+        const padding: Padding = { top: 50, right: 50, bottom: 50, left: 50 }
 
-      parentFrame.appendChild(hueNode)
+        const tintsFrame = new ContainingFrame(
+          `Tints for ${generatedHue}`,
+          layoutMode,
+          padding,
+          20,
+          'AUTO',
+          'AUTO'
+        ).createContainingFrame()
 
-      const selectFrame: FrameNode[] = []
-      selectFrame.push(parentFrame)
+        tints.forEach((tint) => {
+          const tintNode = figma.createEllipse()
+          tintNode.resize(parseInt(circleSize), parseInt(circleSize))
 
-      figma.currentPage.selection = selectFrame
-      figma.viewport.scrollAndZoomIntoView(selectFrame)
+          const { r, g, b } = tint
+
+          const rFraction = r / 255
+          const gFraction = g / 255
+          const bFraction = b / 255
+
+          tintNode.fills = [
+            {
+              type: 'SOLID',
+              color: { r: rFraction, g: gFraction, b: bFraction },
+            },
+          ]
+
+          tintsFrame.appendChild(tintNode)
+
+          const selectFrame: FrameNode[] = []
+          selectFrame.push(parentFrame)
+
+          figma.currentPage.selection = selectFrame
+          figma.viewport.scrollAndZoomIntoView(selectFrame)
+        })
+
+        parentFrame.appendChild(tintsFrame)
+      } else if (shadesForHues === 'on') {
+        const shades = generateShades(
+          figmaR,
+          figmaG,
+          figmaB,
+          shadesForHuesAmount
+        )
+        const layoutMode =
+          frameDirection === 'horizontal' ? 'VERTICAL' : 'HORIZONTAL'
+        const padding: Padding = { top: 50, right: 50, bottom: 50, left: 50 }
+
+        const shadesFrame = new ContainingFrame(
+          `Shades for ${generatedHue}`,
+          layoutMode,
+          padding,
+          20,
+          'AUTO',
+          'AUTO'
+        ).createContainingFrame()
+
+        shades.forEach((shade) => {
+          const shadeNode = figma.createEllipse()
+          shadeNode.resize(parseInt(circleSize), parseInt(circleSize))
+
+          const { r, g, b } = shade
+
+          const rFraction = r / 255
+          const gFraction = g / 255
+          const bFraction = b / 255
+
+          shadeNode.fills = [
+            {
+              type: 'SOLID',
+              color: { r: rFraction, g: gFraction, b: bFraction },
+            },
+          ]
+
+          shadesFrame.appendChild(shadeNode)
+
+          const selectFrame: FrameNode[] = []
+          selectFrame.push(parentFrame)
+
+          figma.currentPage.selection = selectFrame
+          figma.viewport.scrollAndZoomIntoView(selectFrame)
+        })
+
+        parentFrame.appendChild(shadesFrame)
+      } else if (tintsForHues === 'on' && shadesForHues === 'on') {
+      } else {
+        const hueNode = figma.createEllipse()
+        hueNode.resize(parseInt(circleSize), parseInt(circleSize))
+
+        hueNode.fills = [
+          { type: 'SOLID', color: { r: figmaR, g: figmaG, b: figmaB } },
+        ]
+
+        parentFrame.appendChild(hueNode)
+
+        const selectFrame: FrameNode[] = []
+        selectFrame.push(parentFrame)
+
+        figma.currentPage.selection = selectFrame
+        figma.viewport.scrollAndZoomIntoView(selectFrame)
+      }
     })
 
     figma.closePlugin('Hues generated')
