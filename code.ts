@@ -137,6 +137,53 @@ const generateHues = (h: number, s: number, l: number, step: number) => {
   return hsls
 }
 
+interface Padding {
+  top: number
+  right: number
+  bottom: number
+  left: number
+}
+
+class ContainingFrame {
+  name: string
+  layoutMode: 'NONE' | 'HORIZONTAL' | 'VERTICAL'
+  padding: Padding
+  spacing: number
+  primarySizingMode: 'FIXED' | 'AUTO'
+  counterSizingMode: 'FIXED' | 'AUTO'
+  constructor(
+    name: string,
+    layoutMode: 'NONE' | 'HORIZONTAL' | 'VERTICAL',
+    padding: Padding,
+    spacing: number,
+    primarySizingMode: 'FIXED' | 'AUTO',
+    counterSizingMode: 'FIXED' | 'AUTO'
+  ) {
+    this.name = name
+    this.layoutMode = layoutMode
+    this.padding = padding
+    this.spacing = spacing
+    this.primarySizingMode = primarySizingMode
+    this.counterSizingMode = counterSizingMode
+  }
+
+  createContainingFrame() {
+    const containingFrame = figma.createFrame()
+    containingFrame.name = this.name
+    containingFrame.layoutMode = this.layoutMode
+
+    containingFrame.paddingTop = this.padding.top
+    containingFrame.paddingRight = this.padding.right
+    containingFrame.paddingBottom = this.padding.bottom
+    containingFrame.paddingLeft = this.padding.left
+
+    containingFrame.itemSpacing = this.spacing
+    containingFrame.primaryAxisSizingMode = this.primarySizingMode
+    containingFrame.counterAxisSizingMode = this.counterSizingMode
+    return containingFrame
+  }
+}
+
 figma.showUI(__html__, { width: 400, height: 600, title: 'rangi' })
 
 figma.ui.onmessage = (msg) => {
@@ -157,18 +204,20 @@ figma.ui.onmessage = (msg) => {
       tintForHues,
     } = msg.pluginInputs
 
-    const parentFrame = figma.createFrame()
-    parentFrame.name = `Hues for ${colorCode}`
-    parentFrame.layoutMode = frameDirection.toUpperCase()
-
-    parentFrame.paddingTop = 50
-    parentFrame.paddingRight = 50
-    parentFrame.paddingBottom = 50
-    parentFrame.paddingLeft = 50
-
-    parentFrame.itemSpacing = parseInt(circleSpace)
-    parentFrame.primaryAxisSizingMode = 'AUTO'
-    parentFrame.counterAxisSizingMode = 'AUTO'
+    const parentFramePadding: Padding = {
+      top: 50,
+      right: 50,
+      bottom: 50,
+      left: 50,
+    }
+    const parentFrame = new ContainingFrame(
+      `Hues for ${colorCode}`,
+      frameDirection.toUpperCase(),
+      parentFramePadding,
+      parseInt(circleSpace),
+      'AUTO',
+      'AUTO'
+    ).createContainingFrame()
 
     const generatedHues = generateHues(
       hexToHSL(colorCode).h,
