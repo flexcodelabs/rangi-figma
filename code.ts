@@ -198,10 +198,12 @@ figma.ui.onmessage = (msg) => {
       hueNumber,
       shade,
       shadeNumber,
-      shadeForHues,
+      shadesForHues,
+      shadesForHuesAmount,
       tint,
       tintNumber,
-      tintForHues,
+      tintsForHues,
+      tintsForHuesAmount,
     } = msg.pluginInputs
 
     const parentFramePadding: Padding = {

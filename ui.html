@@ -76,6 +76,34 @@
   let tintGroup = document.getElementById('tintGroup')
   let shadeGroup = document.getElementById('shadeGroup')
 
+  class NumberInput {
+    constructor(name) {
+      this.name = name
+    }
+
+    createElement() {
+      let container = document.createElement('div')
+      container.setAttribute('id', `${this.name}sForHuesAmount`)
+
+      let label = document.createElement('label')
+      label.setAttribute('for', `${this.name}sForHuesAmount`)
+      label.textContent = `Amount of ${this.name}s`
+
+      let input = document.createElement('input')
+      input.setAttribute('type', 'number')
+      input.setAttribute('name', `${this.name}sForHuesAmount`)
+      input.setAttribute('id', `${this.name}sForHuesAmount`)
+      input.setAttribute('min', '1')
+      input.setAttribute('max', '100')
+      input.setAttribute('value', '10')
+
+      container.appendChild(label)
+      container.appendChild(input)
+
+      return container
+    }
+  }
+
   class NumberContainer {
     constructor(name, min, max, value) {
       ;(this.name = name),
@@ -108,20 +136,33 @@
 
         options.forEach((option) => {
           let optionContainer = document.createElement('div')
-          optionContainer.setAttribute('id', `${option}ForHuesGroup`)
+          optionContainer.setAttribute('id', `${option}sForHuesGroup`)
 
           let label = document.createElement('label')
-          label.setAttribute('for', `${option}ForHues`)
-          label.textContent = `Generate ${option} for each hue`
+          label.setAttribute('for', `${option}sForHues`)
+          label.textContent = `Generate ${option}s for each hue`
 
           let input = document.createElement('input')
           input.setAttribute('type', 'checkbox')
-          input.setAttribute('name', `${option}ForHues`)
-          input.setAttribute('id', `${option}ForHues`)
+          input.setAttribute('name', `${option}sForHues`)
+          input.setAttribute('id', `${option}sForHues`)
 
           optionContainer.appendChild(input)
           optionContainer.appendChild(label)
           tintHueGroup.appendChild(optionContainer)
+
+          let numberInput = new NumberInput(option).createElement()
+          if (input.checked) {
+            optionContainer.appendChild(numberInput)
+          }
+
+          input.addEventListener('change', () => {
+            if (input.checked) {
+              optionContainer.appendChild(numberInput)
+            } else {
+              optionContainer.removeChild(numberInput)
+            }
+          })
         })
 
         container.appendChild(label)
