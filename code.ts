@@ -808,6 +808,261 @@ figma.ui.onmessage = (msg) => {
       })
       figma.closePlugin('Hues and tints generated for given color')
     } else if (hue === 'on' && shade === 'on') {
+      const parentFramePadding: Padding = {
+        top: 50,
+        right: 50,
+        bottom: 50,
+        left: 50,
+      }
+
+      const parentFrame1 = new ContainingFrame(
+        `Hues for ${colorCode}`,
+        frameDirection.toUpperCase(),
+        parentFramePadding,
+        parseInt(circleSpace),
+        'AUTO',
+        'AUTO'
+      ).createContainingFrame()
+
+      const generatedHues = generateHues(
+        hexToHSL(colorCode).h,
+        hexToHSL(colorCode).s,
+        hexToHSL(colorCode).l,
+        parseInt(hueNumber)
+      )
+
+      generatedHues.forEach((generatedHue) => {
+        const { r, g, b } = hslToRGB(
+          generatedHue.h,
+          generatedHue.s,
+          generatedHue.l
+        )
+
+        const figmaR = r / 255
+        const figmaG = g / 255
+        const figmaB = b / 255
+
+        // Generate tints and/or shades for each hue
+        if (tintsForHues === 'on' && shadesForHues === 'on') {
+          const tints = generateTintsForHues(
+            figmaR,
+            figmaG,
+            figmaB,
+            tintsForHuesAmount
+          )
+
+          const shades = generateShadesForHues(
+            figmaR,
+            figmaG,
+            figmaB,
+            shadesForHuesAmount
+          )
+
+          tints.shift()
+
+          const layoutMode =
+            frameDirection === 'horizontal' ? 'VERTICAL' : 'HORIZONTAL'
+          const padding: Padding = {
+            top: 50,
+            right: 50,
+            bottom: 50,
+            left: 50,
+          }
+
+          const tintsAndShadesFrame = new ContainingFrame(
+            `Tints for ${generatedHue}`,
+            layoutMode,
+            padding,
+            20,
+            'AUTO',
+            'AUTO'
+          ).createContainingFrame()
+
+          const reversedTints = tints.reverse()
+          reversedTints.forEach((tint) => {
+            const tintNode = figma.createEllipse()
+            tintNode.resize(parseInt(circleSize), parseInt(circleSize))
+
+            const { r, g, b } = tint
+
+            const rFraction = r / 255
+            const gFraction = g / 255
+            const bFraction = b / 255
+
+            tintNode.fills = [
+              {
+                type: 'SOLID',
+                color: { r: rFraction, g: gFraction, b: bFraction },
+              },
+            ]
+
+            tintsAndShadesFrame.appendChild(tintNode)
+          })
+
+          shades.forEach((shade) => {
+            const shadeNode = figma.createEllipse()
+            shadeNode.resize(parseInt(circleSize), parseInt(circleSize))
+
+            const { r, g, b } = shade
+
+            const rFraction = r / 255
+            const gFraction = g / 255
+            const bFraction = b / 255
+
+            shadeNode.fills = [
+              {
+                type: 'SOLID',
+                color: { r: rFraction, g: gFraction, b: bFraction },
+              },
+            ]
+
+            tintsAndShadesFrame.appendChild(shadeNode)
+          })
+
+          parentFrame1.appendChild(tintsAndShadesFrame)
+
+          const selectFrame: FrameNode[] = []
+          selectFrame.push(parentFrame1)
+
+          figma.currentPage.selection = selectFrame
+          figma.viewport.scrollAndZoomIntoView(selectFrame)
+
+          figma.closePlugin('Hues with their tints and shades generated')
+        } else if (tintsForHues === 'on') {
+          const tints = generateTintsForHues(
+            figmaR,
+            figmaG,
+            figmaB,
+            tintsForHuesAmount
+          )
+          const layoutMode =
+            frameDirection === 'horizontal' ? 'VERTICAL' : 'HORIZONTAL'
+          const padding: Padding = {
+            top: 50,
+            right: 50,
+            bottom: 50,
+            left: 50,
+          }
+
+          const tintsFrame = new ContainingFrame(
+            `Tints for ${generatedHue}`,
+            layoutMode,
+            padding,
+            20,
+            'AUTO',
+            'AUTO'
+          ).createContainingFrame()
+
+          tints.forEach((tint) => {
+            const tintNode = figma.createEllipse()
+            tintNode.resize(parseInt(circleSize), parseInt(circleSize))
+
+            const { r, g, b } = tint
+
+            const rFraction = r / 255
+            const gFraction = g / 255
+            const bFraction = b / 255
+
+            tintNode.fills = [
+              {
+                type: 'SOLID',
+                color: { r: rFraction, g: gFraction, b: bFraction },
+              },
+            ]
+
+            tintsFrame.appendChild(tintNode)
+
+            const selectFrame: FrameNode[] = []
+            selectFrame.push(parentFrame1)
+          })
+
+          parentFrame1.appendChild(tintsFrame)
+        } else if (shadesForHues === 'on') {
+          const shades = generateShadesForHues(
+            figmaR,
+            figmaG,
+            figmaB,
+            shadesForHuesAmount
+          )
+          const layoutMode =
+            frameDirection === 'horizontal' ? 'VERTICAL' : 'HORIZONTAL'
+          const padding: Padding = {
+            top: 50,
+            right: 50,
+            bottom: 50,
+            left: 50,
+          }
+
+          const shadesFrame = new ContainingFrame(
+            `Shades for ${generatedHue}`,
+            layoutMode,
+            padding,
+            20,
+            'AUTO',
+            'AUTO'
+          ).createContainingFrame()
+
+          shades.forEach((shade) => {
+            const shadeNode = figma.createEllipse()
+            shadeNode.resize(parseInt(circleSize), parseInt(circleSize))
+
+            const { r, g, b } = shade
+
+            const rFraction = r / 255
+            const gFraction = g / 255
+            const bFraction = b / 255
+
+            shadeNode.fills = [
+              {
+                type: 'SOLID',
+                color: { r: rFraction, g: gFraction, b: bFraction },
+              },
+            ]
+
+            shadesFrame.appendChild(shadeNode)
+          })
+
+          parentFrame1.appendChild(shadesFrame)
+          figma.closePlugin('Hues with their shades generated')
+        } else {
+          const hueNode = figma.createEllipse()
+          hueNode.resize(parseInt(circleSize), parseInt(circleSize))
+          hueNode.fills = [
+            { type: 'SOLID', color: { r: figmaR, g: figmaG, b: figmaB } },
+          ]
+
+          parentFrame1.appendChild(hueNode)
+        }
+      })
+
+      const parentFrame2 = new ContainingFrame(
+        `Tints and shades for ${colorCode}`,
+        frameDirection.toUpperCase(),
+        parentFramePadding,
+        parseInt(circleSpace),
+        'AUTO',
+        'AUTO'
+      ).createContainingFrame()
+
+      parentFrame2.y = parentFrame1.height + 100
+
+      const { h, s, l } = hexToHSL(colorCode)
+      const shades = generateShades(h, s, l, shadeNumber)
+
+      shades.forEach((shade) => {
+        const shadeNode = figma.createEllipse()
+        shadeNode.resize(parseInt(circleSize), parseInt(circleSize))
+
+        const figmaR = shade.r / 255
+        const figmaG = shade.g / 255
+        const figmaB = shade.b / 255
+
+        shadeNode.fills = [
+          { type: 'SOLID', color: { r: figmaR, g: figmaG, b: figmaB } },
+        ]
+
+        parentFrame2.appendChild(shadeNode)
+      })
       figma.closePlugin('Hues and shades generated for given color')
     } else if (tint === 'on' && shade === 'on') {
       figma.closePlugin('Tints and shades generated for given color')
