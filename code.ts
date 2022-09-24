@@ -311,7 +311,88 @@ figma.ui.onmessage = (msg) => {
         const figmaG = g / 255
         const figmaB = b / 255
 
-        if (tintsForHues === 'on') {
+        // Generate tints and/or shades for each hue
+        if (tintsForHues === 'on' && shadesForHues === 'on') {
+          const tints = generateTintsForHues(
+            figmaR,
+            figmaG,
+            figmaB,
+            tintsForHuesAmount
+          )
+
+          const shades = generateShadesForHues(
+            figmaR,
+            figmaG,
+            figmaB,
+            shadesForHuesAmount
+          )
+
+          tints.shift()
+
+          const layoutMode =
+            frameDirection === 'horizontal' ? 'VERTICAL' : 'HORIZONTAL'
+          const padding: Padding = { top: 50, right: 50, bottom: 50, left: 50 }
+
+          const tintsAndShadesFrame = new ContainingFrame(
+            `Tints for ${generatedHue}`,
+            layoutMode,
+            padding,
+            20,
+            'AUTO',
+            'AUTO'
+          ).createContainingFrame()
+
+          const reversedTints = tints.reverse()
+          reversedTints.forEach((tint) => {
+            const tintNode = figma.createEllipse()
+            tintNode.resize(parseInt(circleSize), parseInt(circleSize))
+
+            const { r, g, b } = tint
+
+            const rFraction = r / 255
+            const gFraction = g / 255
+            const bFraction = b / 255
+
+            tintNode.fills = [
+              {
+                type: 'SOLID',
+                color: { r: rFraction, g: gFraction, b: bFraction },
+              },
+            ]
+
+            tintsAndShadesFrame.appendChild(tintNode)
+          })
+
+          shades.forEach((shade) => {
+            const shadeNode = figma.createEllipse()
+            shadeNode.resize(parseInt(circleSize), parseInt(circleSize))
+
+            const { r, g, b } = shade
+
+            const rFraction = r / 255
+            const gFraction = g / 255
+            const bFraction = b / 255
+
+            shadeNode.fills = [
+              {
+                type: 'SOLID',
+                color: { r: rFraction, g: gFraction, b: bFraction },
+              },
+            ]
+
+            tintsAndShadesFrame.appendChild(shadeNode)
+          })
+
+          parentFrame.appendChild(tintsAndShadesFrame)
+
+          const selectFrame: FrameNode[] = []
+          selectFrame.push(parentFrame)
+
+          figma.currentPage.selection = selectFrame
+          figma.viewport.scrollAndZoomIntoView(selectFrame)
+
+          figma.closePlugin('Hues with their tints and shades generated')
+        } else if (tintsForHues === 'on') {
           const tints = generateTintsForHues(
             figmaR,
             figmaG,
@@ -407,12 +488,9 @@ figma.ui.onmessage = (msg) => {
 
           parentFrame.appendChild(shadesFrame)
           figma.closePlugin('Hues with their shades generated')
-        } else if (tintsForHues === 'on' && shadesForHues === 'on') {
-          figma.closePlugin('Hues with their tints and shades generated')
         } else {
           const hueNode = figma.createEllipse()
           hueNode.resize(parseInt(circleSize), parseInt(circleSize))
-
           hueNode.fills = [
             { type: 'SOLID', color: { r: figmaR, g: figmaG, b: figmaB } },
           ]
