@@ -1065,6 +1065,61 @@ figma.ui.onmessage = (msg) => {
       })
       figma.closePlugin('Hues and shades generated for given color')
     } else if (tint === 'on' && shade === 'on') {
+      const parentFramePadding: Padding = {
+        top: 50,
+        right: 50,
+        bottom: 50,
+        left: 50,
+      }
+
+      const parentFrame2 = new ContainingFrame(
+        `Tints and shades for ${colorCode}`,
+        frameDirection.toUpperCase(),
+        parentFramePadding,
+        parseInt(circleSpace),
+        'AUTO',
+        'AUTO'
+      ).createContainingFrame()
+
+      const { h, s, l } = hexToHSL(colorCode)
+      const tints = generateTints(h, s, l, tintNumber)
+      const shades = generateShades(h, s, l, shadeNumber)
+
+      tints.shift()
+      const reversedTints = tints.reverse()
+      reversedTints.forEach((tint) => {
+        const tintNode = figma.createEllipse()
+        tintNode.resize(parseInt(circleSize), parseInt(circleSize))
+
+        const figmaR = tint.r / 255
+        const figmaG = tint.g / 255
+        const figmaB = tint.b / 255
+
+        tintNode.fills = [
+          { type: 'SOLID', color: { r: figmaR, g: figmaG, b: figmaB } },
+        ]
+        parentFrame2.appendChild(tintNode)
+      })
+
+      shades.forEach((shade) => {
+        const shadeNode = figma.createEllipse()
+        shadeNode.resize(parseInt(circleSize), parseInt(circleSize))
+
+        const figmaR = shade.r / 255
+        const figmaG = shade.g / 255
+        const figmaB = shade.b / 255
+
+        shadeNode.fills = [
+          { type: 'SOLID', color: { r: figmaR, g: figmaG, b: figmaB } },
+        ]
+
+        parentFrame2.appendChild(shadeNode)
+        const selectFrame: FrameNode[] = []
+        selectFrame.push(parentFrame2)
+
+        figma.currentPage.selection = selectFrame
+        figma.viewport.scrollAndZoomIntoView(selectFrame)
+      })
       figma.closePlugin('Tints and shades generated for given color')
     } else if (hue === 'on') {
       const parentFramePadding: Padding = {
