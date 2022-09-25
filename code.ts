@@ -40,6 +40,7 @@ const hexToHSL = (hex: string) => {
 
   let rgbFromHex = hexValue.match(/.{1,2}/g)
   let rgb: any = []
+
   if (rgbFromHex) {
     rgb = [
       parseInt(rgbFromHex[0], 16),
@@ -102,23 +103,19 @@ const hslToRGB = (h: number, s: number, l: number) => {
   return { r, g, b }
 }
 
-const generateHues = (h: number, s: number, l: number, step: number) => {
+const getHues = (h: number, s: number, l: number, space: number) => {
   let positiveSum = h
   let negativeSum = h
   let hs: number[] = []
 
   while (negativeSum >= 0) {
-    negativeSum -= step
-    if (negativeSum >= 0) {
-      hs.push(negativeSum)
-    }
+    hs.push(negativeSum)
+    negativeSum -= space
   }
 
   while (positiveSum <= 359) {
-    positiveSum += step
-    if (positiveSum <= 359) {
-      hs.push(positiveSum)
-    }
+    hs.push(positiveSum)
+    positiveSum += space
   }
 
   hs = hs.sort((a, b) => a - b)
@@ -141,67 +138,57 @@ const generateHues = (h: number, s: number, l: number, step: number) => {
   return hsls
 }
 
-const generateTints = (h: number, s: number, l: number, step: number) => {
-  const plusFactor = l / step
+const getTints = (h: number, s: number, l: number, space: number) => {
+  const plusFactor = l / space
   const tints = []
 
   while (l <= 100) {
     const tint = hslToRGB(h, s, l)
     tints.push(tint)
-    l = l + plusFactor
+    l += plusFactor
   }
 
   return tints
 }
 
-const generateTintsForHues = (
-  r: number,
-  g: number,
-  b: number,
-  step: number
-) => {
+const getTintsForHues = (r: number, g: number, b: number, space: number) => {
   let { h, s, l } = rgbToHSL(r, g, b)
 
-  const plusFactor = l / step
+  const plusFactor = l / space
   const tints = []
 
   while (l <= 100) {
     const tint = hslToRGB(h, s, l)
     tints.push(tint)
-    l = l + plusFactor
+    l += plusFactor
   }
 
   return tints
 }
 
-const generateShades = (h: number, s: number, l: number, step: number) => {
-  const minusFactor = l / step
+const getShades = (h: number, s: number, l: number, space: number) => {
+  const minusFactor = l / space
   const shades = []
 
   while (l >= 0) {
     const shade = hslToRGB(h, s, l)
     shades.push(shade)
-    l = l - minusFactor
+    l -= minusFactor
   }
 
   return shades
 }
 
-const generateShadesForHues = (
-  r: number,
-  g: number,
-  b: number,
-  step: number
-) => {
+const getShadesForHues = (r: number, g: number, b: number, space: number) => {
   let { h, s, l } = rgbToHSL(r, g, b)
 
-  const minusFactor = l / step
+  const minusFactor = l / space
   const shades = []
 
   while (l >= 0) {
     const shade = hslToRGB(h, s, l)
     shades.push(shade)
-    l = l - minusFactor
+    l -= minusFactor
   }
 
   return shades
@@ -293,7 +280,7 @@ figma.ui.onmessage = (msg) => {
         'AUTO'
       ).createContainingFrame()
 
-      const generatedHues = generateHues(
+      const generatedHues = getHues(
         hexToHSL(colorCode).h,
         hexToHSL(colorCode).s,
         hexToHSL(colorCode).l,
@@ -313,14 +300,14 @@ figma.ui.onmessage = (msg) => {
 
         // Generate tints and/or shades for each hue
         if (tintsForHues === 'on' && shadesForHues === 'on') {
-          const tints = generateTintsForHues(
+          const tints = getTintsForHues(
             figmaR,
             figmaG,
             figmaB,
             tintsForHuesAmount
           )
 
-          const shades = generateShadesForHues(
+          const shades = getShadesForHues(
             figmaR,
             figmaG,
             figmaB,
@@ -398,7 +385,7 @@ figma.ui.onmessage = (msg) => {
 
           figma.closePlugin('Hues with their tints and shades generated')
         } else if (tintsForHues === 'on') {
-          const tints = generateTintsForHues(
+          const tints = getTintsForHues(
             figmaR,
             figmaG,
             figmaB,
@@ -447,7 +434,7 @@ figma.ui.onmessage = (msg) => {
 
           parentFrame1.appendChild(tintsFrame)
         } else if (shadesForHues === 'on') {
-          const shades = generateShadesForHues(
+          const shades = getShadesForHues(
             figmaR,
             figmaG,
             figmaB,
@@ -516,8 +503,8 @@ figma.ui.onmessage = (msg) => {
       parentFrame2.y = parentFrame1.height + 100
 
       const { h, s, l } = hexToHSL(colorCode)
-      const tints = generateTints(h, s, l, tintNumber)
-      const shades = generateShades(h, s, l, shadeNumber)
+      const tints = getTints(h, s, l, tintNumber)
+      const shades = getShades(h, s, l, shadeNumber)
 
       tints.shift()
       const reversedTints = tints.reverse()
@@ -568,7 +555,7 @@ figma.ui.onmessage = (msg) => {
         'AUTO'
       ).createContainingFrame()
 
-      const generatedHues = generateHues(
+      const generatedHues = getHues(
         hexToHSL(colorCode).h,
         hexToHSL(colorCode).s,
         hexToHSL(colorCode).l,
@@ -588,14 +575,14 @@ figma.ui.onmessage = (msg) => {
 
         // Generate tints and/or shades for each hue
         if (tintsForHues === 'on' && shadesForHues === 'on') {
-          const tints = generateTintsForHues(
+          const tints = getTintsForHues(
             figmaR,
             figmaG,
             figmaB,
             tintsForHuesAmount
           )
 
-          const shades = generateShadesForHues(
+          const shades = getShadesForHues(
             figmaR,
             figmaG,
             figmaB,
@@ -673,7 +660,7 @@ figma.ui.onmessage = (msg) => {
 
           figma.closePlugin('Hues with their tints and shades generated')
         } else if (tintsForHues === 'on') {
-          const tints = generateTintsForHues(
+          const tints = getTintsForHues(
             figmaR,
             figmaG,
             figmaB,
@@ -722,7 +709,7 @@ figma.ui.onmessage = (msg) => {
 
           parentFrame1.appendChild(tintsFrame)
         } else if (shadesForHues === 'on') {
-          const shades = generateShadesForHues(
+          const shades = getShadesForHues(
             figmaR,
             figmaG,
             figmaB,
@@ -791,7 +778,7 @@ figma.ui.onmessage = (msg) => {
       parentFrame2.y = parentFrame1.height + 100
 
       const { h, s, l } = hexToHSL(colorCode)
-      const tints = generateTints(h, s, l, tintNumber)
+      const tints = getTints(h, s, l, tintNumber)
 
       tints.forEach((tint) => {
         const tintNode = figma.createEllipse()
@@ -824,7 +811,7 @@ figma.ui.onmessage = (msg) => {
         'AUTO'
       ).createContainingFrame()
 
-      const generatedHues = generateHues(
+      const generatedHues = getHues(
         hexToHSL(colorCode).h,
         hexToHSL(colorCode).s,
         hexToHSL(colorCode).l,
@@ -844,14 +831,14 @@ figma.ui.onmessage = (msg) => {
 
         // Generate tints and/or shades for each hue
         if (tintsForHues === 'on' && shadesForHues === 'on') {
-          const tints = generateTintsForHues(
+          const tints = getTintsForHues(
             figmaR,
             figmaG,
             figmaB,
             tintsForHuesAmount
           )
 
-          const shades = generateShadesForHues(
+          const shades = getShadesForHues(
             figmaR,
             figmaG,
             figmaB,
@@ -929,7 +916,7 @@ figma.ui.onmessage = (msg) => {
 
           figma.closePlugin('Hues with their tints and shades generated')
         } else if (tintsForHues === 'on') {
-          const tints = generateTintsForHues(
+          const tints = getTintsForHues(
             figmaR,
             figmaG,
             figmaB,
@@ -978,7 +965,7 @@ figma.ui.onmessage = (msg) => {
 
           parentFrame1.appendChild(tintsFrame)
         } else if (shadesForHues === 'on') {
-          const shades = generateShadesForHues(
+          const shades = getShadesForHues(
             figmaR,
             figmaG,
             figmaB,
@@ -1047,7 +1034,7 @@ figma.ui.onmessage = (msg) => {
       parentFrame2.y = parentFrame1.height + 100
 
       const { h, s, l } = hexToHSL(colorCode)
-      const shades = generateShades(h, s, l, shadeNumber)
+      const shades = getShades(h, s, l, shadeNumber)
 
       shades.forEach((shade) => {
         const shadeNode = figma.createEllipse()
@@ -1082,8 +1069,8 @@ figma.ui.onmessage = (msg) => {
       ).createContainingFrame()
 
       const { h, s, l } = hexToHSL(colorCode)
-      const tints = generateTints(h, s, l, tintNumber)
-      const shades = generateShades(h, s, l, shadeNumber)
+      const tints = getTints(h, s, l, tintNumber)
+      const shades = getShades(h, s, l, shadeNumber)
 
       tints.shift()
       const reversedTints = tints.reverse()
@@ -1138,7 +1125,7 @@ figma.ui.onmessage = (msg) => {
         'AUTO'
       ).createContainingFrame()
 
-      const generatedHues = generateHues(
+      const generatedHues = getHues(
         hexToHSL(colorCode).h,
         hexToHSL(colorCode).s,
         hexToHSL(colorCode).l,
@@ -1158,14 +1145,14 @@ figma.ui.onmessage = (msg) => {
 
         // Generate tints and/or shades for each hue
         if (tintsForHues === 'on' && shadesForHues === 'on') {
-          const tints = generateTintsForHues(
+          const tints = getTintsForHues(
             figmaR,
             figmaG,
             figmaB,
             tintsForHuesAmount
           )
 
-          const shades = generateShadesForHues(
+          const shades = getShadesForHues(
             figmaR,
             figmaG,
             figmaB,
@@ -1243,7 +1230,7 @@ figma.ui.onmessage = (msg) => {
 
           figma.closePlugin('Hues with their tints and shades generated')
         } else if (tintsForHues === 'on') {
-          const tints = generateTintsForHues(
+          const tints = getTintsForHues(
             figmaR,
             figmaG,
             figmaB,
@@ -1296,7 +1283,7 @@ figma.ui.onmessage = (msg) => {
           parentFrame.appendChild(tintsFrame)
           figma.closePlugin('Hues with their tints generated')
         } else if (shadesForHues === 'on') {
-          const shades = generateShadesForHues(
+          const shades = getShadesForHues(
             figmaR,
             figmaG,
             figmaB,
@@ -1383,7 +1370,7 @@ figma.ui.onmessage = (msg) => {
       ).createContainingFrame()
 
       const { h, s, l } = hexToHSL(colorCode)
-      const tints = generateTints(h, s, l, tintNumber)
+      const tints = getTints(h, s, l, tintNumber)
 
       tints.forEach((tint) => {
         const tintNode = figma.createEllipse()
@@ -1425,7 +1412,7 @@ figma.ui.onmessage = (msg) => {
       ).createContainingFrame()
 
       const { h, s, l } = hexToHSL(colorCode)
-      const shades = generateShades(h, s, l, shadeNumber)
+      const shades = getShades(h, s, l, shadeNumber)
 
       shades.forEach((shade) => {
         const shadeNode = figma.createEllipse()
