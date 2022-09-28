@@ -1,4 +1,4 @@
-<h1>generate hues, shades, and/or shadows</h1>
+<h2>Generate hues, shades, and/or shadows</h2>
 
 <form id="pluginForm">
   <fieldset>
@@ -11,7 +11,7 @@
 
   <fieldset>
     <legend>Generate from the Starting color</legend>
-    <div>
+    <div class="hue-tint-shade">
       <div id="hueGroup">
         <input type="checkbox" name="hue" id="hue" checked />
         <label for="hue">Hue</label>
@@ -116,6 +116,9 @@
       let container = document.createElement('div')
       container.setAttribute('id', `${this.name}NumberContainer`)
 
+      let containerInner = document.createElement('div')
+      containerInner.classList.add('label-input-container')
+
       let label = document.createElement('label')
       label.setAttribute('for', `${this.name}Number`)
       label.textContent = `Space between ${this.name}s`
@@ -127,6 +130,9 @@
       input.setAttribute('min', `${this.min}`)
       input.setAttribute('max', `${this.max}`)
       input.setAttribute('value', `${this.value}`)
+
+      containerInner.appendChild(label)
+      containerInner.appendChild(input)
 
       if (this.name === 'hue') {
         let tintHueGroup = document.createElement('div')
@@ -165,12 +171,10 @@
           })
         })
 
-        container.appendChild(label)
-        container.appendChild(input)
+        container.appendChild(containerInner)
         container.appendChild(tintHueGroup)
       } else {
-        container.appendChild(label)
-        container.appendChild(input)
+        container.appendChild(containerInner)
       }
 
       return container
@@ -243,5 +247,38 @@
 </script>
 
 <style>
-  
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Source+Sans+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+  * {
+    font-family: 'Inter', sans-serif;
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+
+  .hue-tint-shade {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #hueNumberContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .label-input-container {
+    display: flex;
+    width: 75%;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #tintHueGroup {
+    /* display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center; */
+    font-size: 12px;
+  }
 </style>
