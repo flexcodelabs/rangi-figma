@@ -228,54 +228,29 @@ const generateHues = (
   shadesForHuesAmount: number
 ) => {
   const hues = getHues(h, s, l, space)
+  const parentFrame = new Container(
+    `Hues`,
+    frameDirection,
+    padding,
+    spacing,
+    'AUTO',
+    'AUTO'
+  ).createContainer()
 
   hues.forEach(({ h, l, s }) => {
     const hueRgb = hslToRGB(h, s, l)
-    const container = new Container(
-      `Hues`,
-      frameDirection, // frameDirection === 'VERTICAL' ? 'HORIZONTAL' : 'VERTICAL'
-      padding,
-      spacing,
-      'AUTO',
-      'AUTO'
-    ).createContainer()
 
-    const generatedHue = () => {
-
+    const hueCircle = () => {
       const hueNode = figma.createEllipse()
       hueNode.resize(size, size)
 
       const { r, g, b } = hueRgb
       hueNode.fills = [{ type: 'SOLID', color: { r, g, b } }]
 
-      container.appendChild(hueNode)
-
-      return container
+      return hueNode
     }
-    if (tintsForHues === 'on' && shadesForHues === 'on') {
-      const hue = generatedHue()
-      const tints = generateTints(
-        { h, l, s },
-        tintsForHuesAmount,
-        frameDirection,
-        padding,
-        spacing,
-        size
-      )
-      const shades = generateTints(
-        { h, l, s },
-        shadesForHuesAmount,
-        frameDirection,
-        padding,
-        spacing,
-        size
-      )
-      hue.appendChild(tints)
-      hue.appendChild(shades)
 
-      return hue
-    } else if (tintsForHues === 'on') {
-      const hue = generatedHue()
+    if (tintsForHues === 'on' && shadesForHues === 'on') {
       const tints = generateTints(
         { h, l, s },
         tintsForHuesAmount,
@@ -284,11 +259,8 @@ const generateHues = (
         spacing,
         size
       )
-      hue.appendChild(tints)
-      return hue
-    } else if (shadesForHues === 'on') {
-      const hue = generatedHue()
-      const shades = generateTints(
+
+      const shades = generateShades(
         { h, l, s },
         shadesForHuesAmount,
         frameDirection,
@@ -296,12 +268,76 @@ const generateHues = (
         spacing,
         size
       )
-      hue.appendChild(shades)
-      return hue
+
+      const container = new Container(
+        `Hues`,
+        frameDirection,
+        padding,
+        spacing,
+        'AUTO',
+        'AUTO'
+      ).createContainer()
+
+      container.appendChild(tints)
+      container.appendChild(shades)
+
+      parentFrame.layoutMode =
+        frameDirection === 'VERTICAL' ? 'HORIZONTAL' : 'VERTICAL'
+
+      parentFrame.appendChild(container)
+    } else if (tintsForHues === 'on') {
+      const tints = generateTints(
+        { h, l, s },
+        tintsForHuesAmount,
+        frameDirection,
+        padding,
+        spacing,
+        size
+      )
+
+      const container = new Container(
+        `Hues`,
+        frameDirection === 'VERTICAL' ? 'HORIZONTAL' : 'VERTICAL',
+        padding,
+        spacing,
+        'AUTO',
+        'AUTO'
+      ).createContainer()
+
+      container.appendChild(tints)
+
+      parentFrame.layoutMode =
+        frameDirection === 'VERTICAL' ? 'HORIZONTAL' : 'VERTICAL'
+      parentFrame.appendChild(container)
+    } else if (shadesForHues === 'on') {
+      const shades = generateShades(
+        { h, l, s },
+        shadesForHuesAmount,
+        frameDirection,
+        padding,
+        spacing,
+        size
+      )
+
+      const container = new Container(
+        `Hues`,
+        frameDirection === 'VERTICAL' ? 'HORIZONTAL' : 'VERTICAL',
+        padding,
+        spacing,
+        'AUTO',
+        'AUTO'
+      ).createContainer()
+      container.appendChild(shades)
+
+      parentFrame.layoutMode =
+        frameDirection === 'VERTICAL' ? 'HORIZONTAL' : 'VERTICAL'
+      parentFrame.appendChild(container)
     } else {
-      return generatedHue()
+      parentFrame.appendChild(hueCircle())
     }
   })
+
+  return parentFrame
 }
 
 // Generate tints
@@ -418,15 +454,6 @@ figma.ui.onmessage = (msg) => {
       left: 50,
     }
 
-    const parentFrame = new Container(
-      `Shades`,
-      frameDirection,
-      framePadding,
-      70,
-      'AUTO',
-      'AUTO'
-    ).createContainer()
-
     if (hue === 'on' && tint === 'on' && shade === 'on') {
       const hues = generateHues(
         color,
@@ -458,17 +485,91 @@ figma.ui.onmessage = (msg) => {
         circleSize
       )
 
+      const parentFrame = new Container(
+        `Parent Frame`,
+        frameDirection,
+        framePadding,
+        70,
+        'AUTO',
+        'AUTO'
+      ).createContainer()
+
       parentFrame.appendChild(hues)
       parentFrame.appendChild(tints)
       parentFrame.appendChild(shades)
       selectFrame(parentFrame)
-      figma.closePlugin('Tints and shades generated')
+      figma.closePlugin('Hues, tints and shades generated')
     } else if (hue === 'on' && tint === 'on') {
-      // generate hues
-      // generate tints
+      const hues = generateHues(
+        color,
+        hueNumber,
+        frameDirection,
+        framePadding,
+        circleSpace,
+        circleSize,
+        tintsForHues,
+        shadesForHues,
+        tintsForHuesAmount,
+        shadesForHuesAmount
+      )
+      const tints = generateTints(
+        color,
+        tintNumber,
+        frameDirection,
+        framePadding,
+        circleSpace,
+        circleSize
+      )
+
+      const parentFrame = new Container(
+        `Parent Frame`,
+        frameDirection,
+        framePadding,
+        70,
+        'AUTO',
+        'AUTO'
+      ).createContainer()
+
+      parentFrame.appendChild(hues)
+      parentFrame.appendChild(tints)
+      selectFrame(parentFrame)
+      figma.closePlugin('Hues and tints generated')
     } else if (hue === 'on' && shade === 'on') {
-      // generate hues
-      // generate shades
+      const hues = generateHues(
+        color,
+        hueNumber,
+        frameDirection,
+        framePadding,
+        circleSpace,
+        circleSize,
+        tintsForHues,
+        shadesForHues,
+        tintsForHuesAmount,
+        shadesForHuesAmount
+      )
+
+      const shades = generateShades(
+        color,
+        shadeNumber,
+        frameDirection,
+        framePadding,
+        circleSpace,
+        circleSize
+      )
+
+      const parentFrame = new Container(
+        `Parent Frame`,
+        frameDirection,
+        framePadding,
+        70,
+        'AUTO',
+        'AUTO'
+      ).createContainer()
+
+      parentFrame.appendChild(hues)
+      parentFrame.appendChild(shades)
+      selectFrame(parentFrame)
+      figma.closePlugin('Hues and shades generated')
     } else if (tint === 'on' && shade === 'on') {
       const tints = generateTints(
         color,
@@ -488,12 +589,34 @@ figma.ui.onmessage = (msg) => {
         circleSize
       )
 
+      const parentFrame = new Container(
+        `Parent Frame`,
+        frameDirection,
+        framePadding,
+        70,
+        'AUTO',
+        'AUTO'
+      ).createContainer()
+
       parentFrame.appendChild(tints)
       parentFrame.appendChild(shades)
       selectFrame(parentFrame)
       figma.closePlugin('Tints and shades generated')
     } else if (hue === 'on') {
-      // generate hues
+      const hues = generateHues(
+        color,
+        hueNumber,
+        frameDirection,
+        framePadding,
+        circleSpace,
+        circleSize,
+        tintsForHues,
+        shadesForHues,
+        tintsForHuesAmount,
+        shadesForHuesAmount
+      )
+      selectFrame(hues)
+      figma.closePlugin('Hues generated')
     } else if (tint === 'on') {
       const tints = generateTints(
         color,
