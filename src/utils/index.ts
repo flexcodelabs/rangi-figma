@@ -148,8 +148,6 @@ export const getTints = (h: number, s: number, l: number, space: number) => {
     l += plusFactor
   }
 
-  console.log(plusFactor)
-
   return tints
 }
 
@@ -222,8 +220,8 @@ export const generateHues = (
   padding: Padding,
   spacing: number,
   size: number,
-  tintsForHues: string,
-  shadesForHues: string,
+  tintForHue: boolean,
+  shadeForHue: boolean,
   tintsForHuesAmount: number,
   shadesForHuesAmount: number
 ) => {
@@ -250,7 +248,7 @@ export const generateHues = (
       return hueNode
     }
 
-    if (tintsForHues === 'on' && shadesForHues === 'on') {
+    if (tintForHue && shadeForHue) {
       const tints = generateTints(
         { h, l, s },
         tintsForHuesAmount,
@@ -285,7 +283,7 @@ export const generateHues = (
         frameDirection === 'VERTICAL' ? 'HORIZONTAL' : 'VERTICAL'
 
       parentFrame.appendChild(container)
-    } else if (tintsForHues === 'on') {
+    } else if (tintForHue) {
       const tints = generateTints(
         { h, l, s },
         tintsForHuesAmount,
@@ -309,7 +307,7 @@ export const generateHues = (
       parentFrame.layoutMode =
         frameDirection === 'VERTICAL' ? 'HORIZONTAL' : 'VERTICAL'
       parentFrame.appendChild(container)
-    } else if (shadesForHues === 'on') {
+    } else if (shadeForHue) {
       const shades = generateShades(
         { h, l, s },
         shadesForHuesAmount,
