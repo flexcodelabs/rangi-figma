@@ -18,6 +18,10 @@
   gap: 10px;
 }
 
+.section_2 {
+  gap: 0;
+}
+
 .section_title {
   padding: 0 8px;
   font-size: 11px;
@@ -29,9 +33,37 @@
   line-height: 16px;
 }
 
+.setting_container {
+  width: 100%;
+  height: 32px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex: 1 0;
+}
+
+.numeric_input {
+  width: 50px;
+  text-align: center;
+}
+
+.right_content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.right_content_2 {
+  width: 250px;
+}
+
 .action_container {
   width: 100%;
   display: flex;
+  flex-direction: row-reverse;
   align-items: center;
   justify-content: center;
   gap: 20px;
