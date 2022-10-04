@@ -10,8 +10,12 @@ A Figma plugin to help generate hues, tints, and/or shades
 
 - [x] Generate shades from a given color
 
-Find it in Figma community: https://www.figma.com/community/plugin/1153959136228678599
+## Assets & Links
 
-## Roadmap
+UI design of the plugin:
+https://www.figma.com/community/file/1157058671138458897
 
-- [ ] Update the UI to this: https://www.figma.com/community/file/1157058671138458897
+Plugin in Figma community:
+https://www.figma.com/community/plugin/1153959136228678599
+
+Build and maintained with ❤ by [Flexcode Labs](https://flexocelabs.com)

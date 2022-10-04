@@ -1,9 +1,6 @@
-# Node
+.DS_Store
 *.log
-*.log.*
-node_modules
-
-out/
-dist/
-src/*.js
-code.js
+*.css.d.ts
+build/
+node_modules/
+manifest.json
