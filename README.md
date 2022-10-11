@@ -2,8 +2,8 @@
 
 A Figma plugin to help generate hues, tints, and/or shades
 
-<video controls loop width='500' ><source src="./rangi-showcase.mp4"
-            type="video/mp4"></video>
+<img width='500' src="./rangi-showcase.gif"
+            type="image/gif" />
 
 ## Features
 
