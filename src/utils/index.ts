@@ -139,26 +139,24 @@ export const getHues = (h: number, s: number, l: number, space: number) => {
 }
 
 export const getTints = (h: number, s: number, l: number, space: number) => {
-  const plusFactor = l / space
   const tints = []
 
   while (l <= 100) {
     const tint = hslToRGB(h, s, l)
     tints.push(tint)
-    l += plusFactor
+    l += space
   }
 
   return tints
 }
 
 export const getShades = (h: number, s: number, l: number, space: number) => {
-  const minusFactor = l / space
   const shades = []
 
   while (l >= 0) {
     const shade = hslToRGB(h, s, l)
     shades.push(shade)
-    l -= minusFactor
+    l -= space
   }
 
   return shades
