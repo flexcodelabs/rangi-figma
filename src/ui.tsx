@@ -124,9 +124,11 @@ const Plugin = () => {
     emit<GenerateHandler>('GENERATE', inputValues)
   }, [inputValues])
   const handleCancelClick = useCallback(() => emit<CancelHandler>('CANCEL'), [])
+
   return (
-    <div class="container">
-      <div>
+    <div className="container">
+      <script async src="https://tally.so/widgets/embed.js"></script>
+      <div className="w-100">
         {/* Choose colour */}
         <div>
           <div className="section">
@@ -252,7 +254,7 @@ const Plugin = () => {
         </div>
       </div>
 
-      <div className="action_container">
+      <div className="action_container w-100">
         <Button
           onClick={handleGenerateClick}
           style={{ backgroundColor: '#F221B0' }}
@@ -266,7 +268,17 @@ const Plugin = () => {
         </Button>
       </div>
 
-      <div className="footer_container">
+      <Button
+        data-tally-open="wzjAyZ"
+        data-tally-layout="modal"
+        data-tally-align-left="1"
+        data-tally-hide-title="1"
+        data-tally-auto-close="0"
+      >
+        Take our Survey
+      </Button>
+
+      <div className="footer_container w-100">
         <p className="flexcode">
           Developed and maintained at{' '}
           <Link href="https://flexcodelabs.com" target="_blank">

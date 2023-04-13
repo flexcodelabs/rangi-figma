@@ -9,6 +9,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
 }
 
 .section {
@@ -86,4 +87,8 @@
 
 .tanzania {
   color: var(--figma-color-text-tertiary);
+}
+
+.w-100{
+  width: 100%;
 }
