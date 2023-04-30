@@ -268,16 +268,6 @@ const Plugin = () => {
         </Button>
       </div>
 
-      <Button
-        data-tally-open="wzjAyZ"
-        data-tally-layout="modal"
-        data-tally-align-left="1"
-        data-tally-hide-title="1"
-        data-tally-auto-close="0"
-      >
-        Take our Survey
-      </Button>
-
       <div className="footer_container w-100">
         <p className="flexcode">
           Developed and maintained at{' '}
