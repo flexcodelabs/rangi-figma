@@ -1,1 +1,12 @@
-{"api":"1.0.0","editorType":["figma"],"id":"1153959136228678599","name":"rangi","main":"build/main.js","ui":"build/ui.js"}
+{
+  "api": "1.0.0",
+  "editorType": ["figma"],
+  "id": "1153959136228678599",
+  "name": "rangi",
+  "main": "build/main.js",
+  "ui": "build/ui.js",
+  "networkAccess": {
+    "allowedDomains": ["none"],
+    "reasoning": ""
+  }
+}
