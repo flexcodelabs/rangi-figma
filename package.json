@@ -27,6 +27,12 @@
     "name": "rangi",
     "api": "1.0.0",
     "main": "src/main.ts",
-    "ui": "src/ui.tsx"
+    "ui": "src/ui.tsx",
+    "networkAccess": {
+      "allowedDomains": [
+        "none"
+      ],
+      "reasoning": ""
+    }
   }
 }
